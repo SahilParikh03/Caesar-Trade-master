@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package signer.v1;
+
+option go_package = "github.com/caesar-terminal/caesar/internal/gen/signer/v1;signerv1";
+
+// SignerService handles EIP-712 signing for Polymarket orders.
+// The implementation MUST enforce Zero-Disk Access: keys are held in
+// mlock'd memory only, fetched at runtime via AWS KMS, and never logged.
+// Communication is restricted to Unix Domain Sockets (no TCP/IP).
+service SignerService {
+  // SignOrder signs a Polymarket order using EIP-712 typed data.
+  rpc SignOrder(SignOrderRequest) returns (SignOrderResponse);
+
+  // GetSessionStatus returns the current session key's TTL and
+  // remaining value limits.
+  rpc GetSessionStatus(GetSessionStatusRequest) returns (GetSessionStatusResponse);
+}
+
+// ────────────────────────────────────────────
+// SignOrder
+// ────────────────────────────────────────────
+
+message SignOrderRequest {
+  // EIP-712 domain separator fields.
+  EIP712Domain domain = 1;
+
+  // The Polymarket order to sign.
+  PolymarketOrder order = 2;
+}
+
+message SignOrderResponse {
+  // The 65-byte ECDSA signature (r ‖ s ‖ v), hex-encoded.
+  string signature = 1;
+
+  // The Ethereum address that produced the signature.
+  string signer_address = 2;
+
+  // Server-side timestamp (Unix nanos) when the signature was created.
+  int64 signed_at = 3;
+}
+
+// EIP-712 domain separator as defined in EIP-712.
+message EIP712Domain {
+  string name = 1;
+  string version = 2;
+  // Chain ID (e.g. 137 for Polygon mainnet).
+  int64 chain_id = 3;
+  // Verifying contract address (Polymarket CTF Exchange).
+  string verifying_contract = 4;
+}
+
+// A Polymarket order matching the CTF Exchange typed-data schema.
+message PolymarketOrder {
+  // ERC-4337 smart-account or EOA address placing the order.
+  string maker = 1;
+
+  // The account that will execute the trade on behalf of the maker (operator).
+  string taker = 2;
+
+  // Polymarket condition token ID (bytes32 hex).
+  string token_id = 3;
+
+  // Market condition ID (bytes32 hex).
+  string condition_id = 4;
+
+  // BUY = 0, SELL = 1.
+  OrderSide side = 5;
+
+  // Order size in the market's base asset (raw units as string to avoid
+  // floating-point precision loss).
+  string maker_amount = 6;
+
+  // Amount the taker will pay/receive (raw units).
+  string taker_amount = 7;
+
+  // Unix timestamp (seconds) after which the order is invalid.
+  uint64 expiration = 8;
+
+  // Monotonically increasing nonce for replay protection.
+  uint64 nonce = 9;
+
+  // Fee rate in basis points.
+  uint32 fee_rate_bps = 10;
+
+  // Signature type: EOA = 0, POLY_PROXY = 1, POLY_GNOSIS_SAFE = 2.
+  SignatureType signature_type = 11;
+}
+
+enum OrderSide {
+  ORDER_SIDE_UNSPECIFIED = 0;
+  ORDER_SIDE_BUY = 1;
+  ORDER_SIDE_SELL = 2;
+}
+
+enum SignatureType {
+  SIGNATURE_TYPE_UNSPECIFIED = 0;
+  SIGNATURE_TYPE_EOA = 1;
+  SIGNATURE_TYPE_POLY_PROXY = 2;
+  SIGNATURE_TYPE_POLY_GNOSIS_SAFE = 3;
+}
+
+// ────────────────────────────────────────────
+// GetSessionStatus
+// ────────────────────────────────────────────
+
+message GetSessionStatusRequest {}
+
+message GetSessionStatusResponse {
+  // Whether a session key is currently active.
+  bool active = 1;
+
+  // Remaining TTL in seconds. 0 if no session is active.
+  int64 ttl_seconds = 2;
+
+  // Maximum cumulative value (in USDC raw units) the session key is
+  // permitted to sign. Empty string if unlimited.
+  string max_value_limit = 3;
+
+  // Value already consumed against the limit.
+  string value_used = 4;
+
+  // Ethereum address of the active session key.
+  string session_address = 5;
+}

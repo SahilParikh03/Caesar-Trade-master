@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(go mod init:*)",
+      "Bash(where:*)",
+      "Bash(buf:*)",
+      "Bash(protoc:*)",
+      "Bash(go install:*)",
+      "Bash(choco:*)",
+      "Bash(scoop:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go build:*)",
+      "Bash(go get:*)",
+      "Bash(go test:*)",
+      "Bash(go doc:*)",
+      "Bash(go vet:*)"
+    ]
+  }
+}

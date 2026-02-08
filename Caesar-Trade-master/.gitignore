@@ -1,0 +1,38 @@
+# Binaries
+/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go
+/vendor/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Proto generated
+/internal/gen/
+
+# Frontend
+/frontend/node_modules/
+/frontend/.next/
+/frontend/out/
+
+# Docker
+docker-compose.override.yml
+
+# Test
+coverage.out
+coverage.html

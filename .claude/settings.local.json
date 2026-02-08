@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where:*)",
+      "Bash(buf generate:*)",
+      "Bash(go get:*)",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go mod tidy:*)"
+    ]
+  }
+}
