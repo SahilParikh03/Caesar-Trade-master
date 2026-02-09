@@ -8,7 +8,9 @@
       "Bash(go test:*)",
       "Bash(go mod tidy:*)",
       "Bash(docker compose build:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.polymarket.com)"
     ]
   }
 }
