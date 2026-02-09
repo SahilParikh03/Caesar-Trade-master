@@ -52,6 +52,26 @@ services:
       localstack:
         condition: service_started
 
+  test-runner:
+    image: golang:1.24-alpine
+    profiles: [test]
+    cap_add:
+      - IPC_LOCK
+    working_dir: /src
+    volumes:
+      - .:/src:ro
+      - signer-sock:/var/run/caesar
+    environment:
+      CAESAR_ENV: development
+      CAESAR_SIGNER_SOCKET_PATH: /var/run/caesar/signer.sock
+      CAESAR_LOCALSTACK_ENDPOINT: http://localstack:4566
+    depends_on:
+      - signer
+      - localstack
+    command: >
+      sh -c "apk add --no-cache build-base &&
+             go test -v -count=1 -run Integration ./internal/signer/"
+
 volumes:
   pgdata:
   localstack:
