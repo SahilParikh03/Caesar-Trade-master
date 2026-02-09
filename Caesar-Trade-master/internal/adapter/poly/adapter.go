@@ -43,6 +43,10 @@ type rawEnvelope struct {
 type PolyAdapter struct {
 	ws *adapter.WSClient
 
+	// raw is the fan-out channel from WSClient, registered at construction
+	// so no messages are missed between Connect and Run.
+	raw <-chan []byte
+
 	// updates receives normalised book updates for downstream consumers.
 	updates chan adapter.BookUpdate
 
@@ -51,10 +55,12 @@ type PolyAdapter struct {
 }
 
 // New creates a PolyAdapter backed by the given WSClient.
-// The caller must have already called ws.Connect.
+// It immediately subscribes to the WSClient fan-out so messages arriving
+// before Run() are buffered rather than lost.
 func New(ws *adapter.WSClient) *PolyAdapter {
 	return &PolyAdapter{
 		ws:      ws,
+		raw:     ws.Subscribe(),
 		updates: make(chan adapter.BookUpdate, 1024),
 		levelPool: sync.Pool{
 			New: func() any {
@@ -84,12 +90,11 @@ func (pa *PolyAdapter) Subscribe(tokenID string) {
 // pushes BookUpdate values to the updates channel. It blocks until ctx
 // is cancelled.
 func (pa *PolyAdapter) Run(ctx context.Context) {
-	sub := pa.ws.Subscribe()
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case raw, ok := <-sub:
+		case raw, ok := <-pa.raw:
 			if !ok {
 				return
 			}
