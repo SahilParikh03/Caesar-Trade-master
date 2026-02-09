@@ -58,7 +58,7 @@ func Load() (*Config, error) {
 	v.SetDefault("env", "development")
 
 	// Signer defaults
-	v.SetDefault("signer.socket_path", "/var/run/caesar/signer.sock")
+	v.SetDefault("signer.socket_path", "/tmp/signer.sock")
 	v.SetDefault("signer.session_ttl_sec", 3600)
 	v.SetDefault("signer.aws_region", "us-east-1")
 

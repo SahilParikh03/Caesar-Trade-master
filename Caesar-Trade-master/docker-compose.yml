@@ -35,6 +35,13 @@ services:
     volumes:
       - localstack:/var/lib/localstack
 
+  init-permissions:
+    image: alpine
+    user: root
+    volumes:
+      - signer-sock:/tmp
+    command: chown -R 10001:10001 /tmp
+
   signer:
     build:
       context: .
@@ -43,12 +50,14 @@ services:
       - IPC_LOCK
     environment:
       CAESAR_ENV: development
-      CAESAR_SIGNER_SOCKET_PATH: /var/run/caesar/signer.sock
+      CAESAR_SIGNER_SOCKET_PATH: /tmp/signer.sock
       CAESAR_SIGNER_SESSION_TTL_SEC: "3600"
       CAESAR_LOCALSTACK_ENDPOINT: http://localstack:4566
     volumes:
-      - signer-sock:/var/run/caesar
+      - signer-sock:/tmp
     depends_on:
+      init-permissions:
+        condition: service_completed_successfully
       localstack:
         condition: service_started
 
@@ -60,10 +69,10 @@ services:
     working_dir: /src
     volumes:
       - .:/src:ro
-      - signer-sock:/var/run/caesar
+      - signer-sock:/tmp
     environment:
       CAESAR_ENV: development
-      CAESAR_SIGNER_SOCKET_PATH: /var/run/caesar/signer.sock
+      CAESAR_SIGNER_SOCKET_PATH: /tmp/signer.sock
       CAESAR_LOCALSTACK_ENDPOINT: http://localstack:4566
     depends_on:
       - signer

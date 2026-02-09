@@ -20,9 +20,12 @@ type Server struct {
 // New creates a new Signer gRPC server bound to the given UDS path.
 // It registers the SignerService handler and prepares the listener.
 func New(socketPath string, session *SessionManager) (*Server, error) {
-	// Ensure the socket directory exists.
-	if err := os.MkdirAll(filepath.Dir(socketPath), 0o700); err != nil {
-		return nil, fmt.Errorf("create socket directory: %w", err)
+	// Ensure the socket directory exists (skip if it already does, e.g. /tmp).
+	dir := filepath.Dir(socketPath)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			return nil, fmt.Errorf("create socket directory: %w", err)
+		}
 	}
 
 	// Remove any stale socket file from a previous run.

@@ -41,8 +41,8 @@ COPY --from=builder /etc/signer-passwd /etc/passwd
 # Copy the statically-linked binary.
 COPY --from=builder /signer /signer
 
-# Create the socket directory. The volume mount will overlay this.
-VOLUME ["/var/run/caesar"]
+# Socket lives directly in /tmp (world-writable, no sub-directory needed).
+VOLUME ["/tmp"]
 
 # Run as non-root.
 USER 10001
