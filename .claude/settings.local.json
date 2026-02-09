@@ -10,7 +10,11 @@
       "Bash(docker compose build:*)",
       "Bash(tasklist:*)",
       "WebSearch",
-      "WebFetch(domain:docs.polymarket.com)"
+      "WebFetch(domain:docs.polymarket.com)",
+      "WebFetch(domain:docs.kalshi.com)",
+      "WebFetch(domain:zuplo.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

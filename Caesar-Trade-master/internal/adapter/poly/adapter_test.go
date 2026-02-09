@@ -115,6 +115,10 @@ func TestPolyAdapter_ParseBookEvent(t *testing.T) {
 	cfg.HeartbeatTimeout = 5 * time.Second
 	ws := adapter.NewWSClient(cfg)
 
+	// Create adapter before Connect so the fan-out subscriber is
+	// registered before any messages arrive from the server.
+	pa := New(ws)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -123,7 +127,6 @@ func TestPolyAdapter_ParseBookEvent(t *testing.T) {
 	}
 	defer ws.Close()
 
-	pa := New(ws)
 	go pa.Run(ctx)
 
 	select {
