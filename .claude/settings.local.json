@@ -6,7 +6,9 @@
       "Bash(go get:*)",
       "Bash(go build:*)",
       "Bash(go test:*)",
-      "Bash(go mod tidy:*)"
+      "Bash(go mod tidy:*)",
+      "Bash(docker compose build:*)",
+      "Bash(tasklist:*)"
     ]
   }
 }
