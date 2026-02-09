@@ -14,7 +14,8 @@
       "WebFetch(domain:docs.kalshi.com)",
       "WebFetch(domain:zuplo.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(ls \"C:\\\\Users\\\\ReachElysium\\\\Documents\\\\Caesar-Trade-master\\\\Caesar-Trade-master\\\\internal\\\\engine\"\" 2>nul || echo \"directory does not exist \")"
     ]
   }
 }
